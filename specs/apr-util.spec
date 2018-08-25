@@ -13,26 +13,26 @@
 
 %define apuver 1
 
-Name:               apr-util
-Version:            1.6.1
-Release:            2%{?dist}
-Summary:            Apache Portable Runtime Utility library
-Group:              System Environment/Libraries
-License:            ASL 2.0
-URL:                https://apr.apache.org/
+Name:                   apr-util
+Version:                1.6.1
+Release:                2%{?dist}
+Summary:                Apache Portable Runtime Utility library
+Group:                  System Environment/Libraries
+License:                ASL 2.0
+URL:                    https://apr.apache.org/
 
-Source0:            https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
+Source0:                https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
 # PGP signature
-Source100:          https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2.asc
+Source100:              https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2.asc
 
-Patch1:             apr-util-1.2.7-pkgconf.patch
-Patch4:             apr-util-1.4.1-private.patch
+Patch1:                 apr-util-1.2.7-pkgconf.patch
+Patch4:                 apr-util-1.4.1-private.patch
 
-BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildRequires:      autoconf, apr-devel >= 1.3.0
-BuildRequires:      %{dbdep}, expat-devel, libuuid-devel
+BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRequires:          autoconf, apr-devel >= 1.3.0
+BuildRequires:          %{dbdep}, expat-devel, libuuid-devel
 %if 0%{?fedora} < 27
-Requires:           apr-util-bdb%{?_isa} = %{version}-%{release}
+Requires:               apr-util-bdb%{?_isa} = %{version}-%{release}
 %endif
 
 %description
@@ -46,15 +46,15 @@ for XML, LDAP, database interfaces, URI parsing and more.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package devel
-Group:              Development/Libraries
-Summary:            APR utility library development kit
-Requires:           apr-util%{?_isa} = %{version}-%{release}, apr-devel%{?_isa}, pkgconfig
-Requires:           %{dbdep}%{?_isa}, expat-devel%{?_isa}, openldap-devel%{?_isa}
+Group:                  Development/Libraries
+Summary:                APR utility library development kit
+Requires:               apr-util%{?_isa} = %{version}-%{release}, apr-devel%{?_isa}, pkgconfig
+Requires:               %{dbdep}%{?_isa}, expat-devel%{?_isa}, openldap-devel%{?_isa}
 
 %description devel
-This package provides the support files which can be used to 
-build applications using the APR utility library.  The mission 
-of the Apache Portable Runtime (APR) is to provide a free 
+This package provides the support files which can be used to
+build applications using the APR utility library.  The mission
+of the Apache Portable Runtime (APR) is to provide a free
 library of C data structures and routines.
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -62,10 +62,10 @@ library of C data structures and routines.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package pgsql
-Group:              Development/Libraries
-Summary:            APR utility library PostgreSQL DBD driver
-BuildRequires:      postgresql-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library PostgreSQL DBD driver
+BuildRequires:          postgresql-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description pgsql
 This package provides the PostgreSQL driver for the apr-util
@@ -76,10 +76,10 @@ DBD (database abstraction) interface.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package bdb
-Group:              Development/Libraries
-Summary:            APR utility library Berkeley DB driver
-BuildRequires:      postgresql-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library Berkeley DB driver
+BuildRequires:          postgresql-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description bdb
 This package provides the Berkeley DB driver for the apr-util
@@ -90,10 +90,10 @@ DBM (database abstraction) interface.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package mysql
-Group:              Development/Libraries
-Summary:            APR utility library MySQL DBD driver
-BuildRequires:      mysql-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library MySQL DBD driver
+BuildRequires:          mysql-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description mysql
 This package provides the MySQL driver for the apr-util DBD
@@ -104,10 +104,10 @@ This package provides the MySQL driver for the apr-util DBD
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package sqlite
-Group:              Development/Libraries
-Summary:            APR utility library SQLite DBD driver
-BuildRequires:      sqlite-devel >= 3.0.0
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library SQLite DBD driver
+BuildRequires:          sqlite-devel >= 3.0.0
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description sqlite
 This package provides the SQLite driver for the apr-util DBD
@@ -118,10 +118,10 @@ This package provides the SQLite driver for the apr-util DBD
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package odbc
-Group:              Development/Libraries
-Summary:            APR utility library ODBC DBD driver
-BuildRequires:      unixODBC-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library ODBC DBD driver
+BuildRequires:          unixODBC-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description odbc
 This package provides the ODBC driver for the apr-util DBD
@@ -132,10 +132,10 @@ This package provides the ODBC driver for the apr-util DBD
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package ldap
-Group:              Development/Libraries
-Summary:            APR utility library LDAP support
-BuildRequires:      openldap-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library LDAP support
+BuildRequires:          openldap-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description ldap
 This package provides the LDAP support for the apr-util.
@@ -145,20 +145,20 @@ This package provides the LDAP support for the apr-util.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 %package openssl
-Group:              Development/Libraries
-Summary:            APR utility library OpenSSL crypto support
-BuildRequires:      openssl-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library OpenSSL crypto support
+BuildRequires:          openssl-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description openssl
 This package provides the OpenSSL crypto support for the apr-util.
 
 %if %{with_nss}
 %package nss
-Group:              Development/Libraries
-Summary:            APR utility library NSS crypto support
-BuildRequires:      nss-devel
-Requires:           apr-util%{?_isa} = %{version}-%{release}
+Group:                  Development/Libraries
+Summary:                APR utility library NSS crypto support
+BuildRequires:          nss-devel
+Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description nss
 This package provides the NSS crypto support for the apr-util.
