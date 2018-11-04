@@ -1,4 +1,3 @@
-
 %if 0%{?fedora} < 18 && 0%{?rhel} < 7
 %define dbdep db4-devel
 %else
@@ -15,24 +14,31 @@
 
 Name:                   apr-util
 Version:                1.6.1
-Release:                2%{?dist}
+Release:                9%{?dist}
 Summary:                Apache Portable Runtime Utility library
-Group:                  System Environment/Libraries
 License:                ASL 2.0
+Group:                  System Environment/Libraries
 URL:                    https://apr.apache.org/
 
-Source0:                https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
-# PGP signature
-Source100:              https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2.asc
+Source0:                https://apache.org/dist/apr/%{name}-%{version}.tar.bz2
+
+# METASTORE - [
+# Signature
+Source900:              https://apache.org/dist/apr/%{name}-%{version}.tar.bz2.asc
+# ] - METASTORE
 
 Patch1:                 apr-util-1.2.7-pkgconf.patch
 Patch4:                 apr-util-1.4.1-private.patch
+Patch5:                 apr-util-mariadb-upstream.patch
 
-BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRequires:          gcc
 BuildRequires:          autoconf, apr-devel >= 1.3.0
 BuildRequires:          %{dbdep}, expat-devel, libuuid-devel
+#Recommends:             apr-util-openssl%{_isa} = %{version}-%{release}
 %if 0%{?fedora} < 27
 Requires:               apr-util-bdb%{?_isa} = %{version}-%{release}
+%else
+#Recommends:             apr-util-bdb%{_isa} = %{version}-%{release}
 %endif
 
 %description
@@ -52,9 +58,9 @@ Requires:               apr-util%{?_isa} = %{version}-%{release}, apr-devel%{?_i
 Requires:               %{dbdep}%{?_isa}, expat-devel%{?_isa}, openldap-devel%{?_isa}
 
 %description devel
-This package provides the support files which can be used to
-build applications using the APR utility library.  The mission
-of the Apache Portable Runtime (APR) is to provide a free
+This package provides the support files which can be used to 
+build applications using the APR utility library.  The mission 
+of the Apache Portable Runtime (APR) is to provide a free 
 library of C data structures and routines.
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -78,7 +84,6 @@ DBD (database abstraction) interface.
 %package bdb
 Group:                  Development/Libraries
 Summary:                APR utility library Berkeley DB driver
-BuildRequires:          postgresql-devel
 Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description bdb
@@ -92,7 +97,7 @@ DBM (database abstraction) interface.
 %package mysql
 Group:                  Development/Libraries
 Summary:                APR utility library MySQL DBD driver
-BuildRequires:          mysql-devel
+BuildRequires:          mariadb-devel
 Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description mysql
@@ -154,6 +159,11 @@ Requires:               apr-util%{?_isa} = %{version}-%{release}
 This package provides the OpenSSL crypto support for the apr-util.
 
 %if %{with_nss}
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# Package: nss
+# -------------------------------------------------------------------------------------------------------------------- #
+
 %package nss
 Group:                  Development/Libraries
 Summary:                APR utility library NSS crypto support
@@ -162,6 +172,7 @@ Requires:               apr-util%{?_isa} = %{version}-%{release}
 
 %description nss
 This package provides the NSS crypto support for the apr-util.
+
 %endif
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -172,6 +183,7 @@ This package provides the NSS crypto support for the apr-util.
 %setup -q
 %patch1 -p1 -b .pkgconf
 %patch4 -p1 -b .private
+%patch5 -p1 -b .maria
 
 %build
 autoheader && autoconf
@@ -179,16 +191,16 @@ autoheader && autoconf
 # any other warning; force correct result for OpenLDAP:
 export ac_cv_ldap_set_rebind_proc_style=three
 %configure --with-apr=%{_prefix} \
-        --includedir=%{_includedir}/apr-%{apuver} \
-        --with-ldap=ldap_r --without-gdbm \
-        --with-sqlite3 --with-pgsql --with-mysql --with-odbc \
-        --with-dbm=db5 --with-berkeley-db \
-        --without-sqlite2 \
-        --with-crypto --with-openssl \
+    --includedir=%{_includedir}/apr-%{apuver} \
+    --with-ldap=ldap_r --without-gdbm \
+    --with-sqlite3 --with-pgsql --with-mysql --with-odbc \
+    --with-dbm=db5 --with-berkeley-db \
+    --without-sqlite2 \
+    --with-crypto --with-openssl \
 %if %{with_nss}
-        --with-nss
+    --with-nss
 %else
-        --without-nss
+    --without-nss
 %endif
 make %{?_smp_mflags}
 
@@ -201,16 +213,16 @@ install -m 644 build/find_apu.m4 $RPM_BUILD_ROOT/%{_datadir}/aclocal
 
 # Unpackaged files; remove the static libaprutil
 rm -f $RPM_BUILD_ROOT%{_libdir}/aprutil.exp \
-      $RPM_BUILD_ROOT%{_libdir}/libapr*.a
+    $RPM_BUILD_ROOT%{_libdir}/libapr*.a
 
 # And remove the reference to the static libaprutil from the .la
 # file.
 sed -i '/^old_library/s,libapr.*\.a,,' \
-      $RPM_BUILD_ROOT%{_libdir}/libapr*.la
+    $RPM_BUILD_ROOT%{_libdir}/libapr*.la
 
 # Remove unnecessary exports from dependency_libs
 sed -ri '/^dependency_libs/{s,-l(pq|sqlite[0-9]|rt|dl|uuid) ,,g}' \
-      $RPM_BUILD_ROOT%{_libdir}/libapr*.la
+    $RPM_BUILD_ROOT%{_libdir}/libapr*.la
 
 # Trim libtool DSO cruft
 rm -f $RPM_BUILD_ROOT%{_libdir}/apr-util-%{apuver}/*.*a
@@ -224,55 +236,42 @@ make %{?_smp_mflags} testall
 export LD_LIBRARY_PATH=%{buildroot}/%{_libdir}/apr-util-%{apuver}
 ./testall -v -q
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
 %doc CHANGES LICENSE NOTICE
 %{_libdir}/libaprutil-%{apuver}.so.*
 %dir %{_libdir}/apr-util-%{apuver}
 
 %files bdb
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbm_db*
 
 %files pgsql
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbd_pgsql*
 
 %files mysql
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbd_mysql*
 
 %files sqlite
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %files odbc
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_dbd_odbc*
 
 %files ldap
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_ldap*
 
 %files openssl
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_crypto_openssl*
 
 %if %{with_nss}
 %files nss
-%defattr(-,root,root,-)
 %{_libdir}/apr-util-%{apuver}/apr_crypto_nss*
 %endif
 
 %files devel
-%defattr(-,root,root,-)
 %{_bindir}/apu-%{apuver}-config
 %{_libdir}/libaprutil-%{apuver}.*a
 %{_libdir}/libaprutil-%{apuver}.so
@@ -281,8 +280,30 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/aclocal/*.m4
 
 %changelog
-* Sat Dec 16 2017 Kitsune Solar <kitsune.solar@gmail.com> - 1.6.1-2
-- Build from RHEL7
+* Thu Nov 01 2018 Kitsune Solar <kitsune.solar@gmail.com> - 1.6.1-9
+- Build for EL7.
+
+* Wed Sep 26 2018 Joe Orton <jorton@redhat.com> - 1.6.1-8
+- Recommends: -openssl and -bdb so default crypto, dbm drivers are
+  always available (#1491151, #1633152)
+
+* Thu Jul 12 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
+* Fri Mar  9 2018 Bojan Smojver <bojan@rexursive.com> - 1.6.1-6
+- add gcc build requirement
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Fri Jan 26 2018 Florian Weimer <fweimer@redhat.com> - 1.6.1-4
+- Rebuild with new build flags embedded in apr
+
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 1.6.1-3
+- Rebuilt for switch to libxcrypt
+
+* Tue Dec 19 2017 Honza Horak <hhorak@redhat.com> - 1.6.1-2
+- Build with mariadb-connector-c
 
 * Wed Oct 25 2017 Luboš Uhliarik <luhliari@redhat.com> - 1.6.1-1
 - new version 1.6.1
